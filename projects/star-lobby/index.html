@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="四人联机大厅与副本原型——支持四名玩家创建房间、选择角色并进入合作副本的联机原型，覆盖大厅状态同步、断线重连和弱网下的角色移动。">
+  <meta property="og:title" content="StarLobby · 项目档案">
+  <meta property="og:description" content="四人联机大厅与副本原型——支持四名玩家创建房间、选择角色并进入合作副本的联机原型，覆盖大厅状态同步、断线重连和弱网下的角色移动。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="../../assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>StarLobby · 项目档案</title>
+  <link rel="icon" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+<main class="project-page project-theme-yellow">
+  <nav class="pixel-nav detail-nav" aria-label="项目导航"><a class="logo" href="../../">U7<span>.DEV</span></a><a class="back-link" href="../../#projects">← 返回项目列表</a></nav>
+  <header class="project-hero">
+    <div class="project-kicker">CASE FILE / 02</div>
+    <div class="project-title-row"><div><p>ONLINE GAME · 2025</p><h1>StarLobby</h1><h2>四人联机大厅与副本原型</h2></div><div class="detail-pixel-art" aria-hidden="true"><i></i><b></b><em></em><span></span></div></div>
+    <div class="detail-tags"><span>Unity</span><span>C#</span><span>Netcode</span></div>
+  </header>
+  <section class="project-summary">
+    <div><p class="mini-label">PROJECT INTRO</p><h2>项目介绍</h2></div>
+    <div class="summary-copy"><p class="lead">支持四名玩家创建房间、选择角色并进入合作副本的联机原型，覆盖大厅状态同步、断线重连和弱网下的角色移动。</p><div class="challenge-grid"><div><span>CHALLENGE</span><p>大厅和副本之间存在多次场景切换；玩家准备、角色占用和连接状态必须保持一致，同时还要让高延迟玩家获得可接受的移动体验。</p></div><div><span>OUTCOME</span><p>将房间状态与场景对象分离，并加入客户端预测和服务端校正；150ms 模拟延迟下，移动与交互仍保持稳定。</p></div></div></div>
+  </section>
+  <section class="metric-strip"><div><strong>4P</strong><span>联机玩家数</span></div><div><strong>150ms</strong><span>弱网测试延迟</span></div><div><strong>98.6%</strong><span>重连恢复成功率</span></div></section>
+  <section class="project-structure">
+    <div class="detail-section-head"><p class="mini-label">SYSTEM MAP</p><h2>项目结构</h2><p>从核心体验出发，把产品拆成边界清楚、能独立演进的四个部分。</p></div>
+    <div class="structure-grid"><article><span>01</span><h3>会话大厅</h3><p>维护房间、成员、准备状态与角色选择，保证状态只由服务器权威修改。</p></article><article><span>02</span><h3>场景流程</h3><p>用持久 Session 数据跨越大厅与副本场景，并对加载进度做分阶段确认。</p></article><article><span>03</span><h3>移动同步</h3><p>本地预测即时响应输入，服务端校验并下发快照，客户端对误差进行平滑回滚。</p></article><article><span>04</span><h3>断线恢复</h3><p>以玩家身份令牌重新绑定角色，将关键局内状态从服务器快照恢复到新连接。</p></article></div>
+  </section>
+  <section class="design-decisions">
+    <div class="detail-section-head"><p class="mini-label">BEHIND THE PIXELS</p><h2>细节设计思路</h2><p>真正影响体验的，往往是那些看起来很小的决定。</p></div>
+    <div class="decision-list"><article><div class="decision-number">A</div><div><h3>大厅状态不依赖场景中的 GameObject</h3><p>房间数据放在独立会话模型中，UI 只是订阅者。即使切换场景或重建界面，玩家状态也不会丢失。</p></div><aside>↳ 数据生命周期长于场景</aside></article><article><div class="decision-number">B</div><div><h3>校正应该发生，但不必被玩家看见</h3><p>小误差用插值逐步收敛，只有超过阈值才瞬移纠正；镜头跟随使用独立平滑层隔离网络抖动。</p></div><aside>↳ 预测、校验、表现三层分离</aside></article><article><div class="decision-number">C</div><div><h3>把弱网当成正常状态设计</h3><p>操作未确认时显示轻量状态，失败后回滚局部交互并保留玩家选择，而不是把用户直接踢回首页。</p></div><aside>↳ 失败可恢复</aside></article></div>
+  </section>
+  <section class="next-project"><p>NEXT CASE / 03</p><a href="../frame-scope/"><span>继续浏览</span><strong>FrameScope</strong><b>→</b></a></section>
+  <footer class="detail-footer"><a class="logo" href="../../">U7<span>.DEV</span></a><p>DESIGNED &amp; BUILT WITH CURIOSITY · 2026</p></footer>
+</main>
+</body>
+</html>
