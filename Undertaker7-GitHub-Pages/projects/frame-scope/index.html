@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="客户端性能与资源巡检工具——面向中小型 Unity 项目的编辑器巡检工具，一键定位重复资源、异常贴图、加载峰值和场景中的高开销对象。">
+  <meta property="og:title" content="FrameScope · 项目档案">
+  <meta property="og:description" content="客户端性能与资源巡检工具——面向中小型 Unity 项目的编辑器巡检工具，一键定位重复资源、异常贴图、加载峰值和场景中的高开销对象。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="../../assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>FrameScope · 项目档案</title>
+  <link rel="icon" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../assets/styles.css">
+</head>
+<body>
+<main class="project-page project-theme-coral">
+  <nav class="pixel-nav detail-nav" aria-label="项目导航"><a class="logo" href="../../">U7<span>.DEV</span></a><a class="back-link" href="../../#projects">← 返回项目列表</a></nav>
+  <header class="project-hero">
+    <div class="project-kicker">CASE FILE / 03</div>
+    <div class="project-title-row"><div><p>DEV TOOL · 2025</p><h1>FrameScope</h1><h2>客户端性能与资源巡检工具</h2></div><div class="detail-pixel-art" aria-hidden="true"><i></i><b></b><em></em><span></span></div></div>
+    <div class="detail-tags"><span>Unity Editor</span><span>C#</span><span>Addressables</span></div>
+  </header>
+  <section class="project-summary">
+    <div><p class="mini-label">PROJECT INTRO</p><h2>项目介绍</h2></div>
+    <div class="summary-copy"><p class="lead">面向中小型 Unity 项目的编辑器巡检工具，一键定位重复资源、异常贴图、加载峰值和场景中的高开销对象。</p><div class="challenge-grid"><div><span>CHALLENGE</span><p>性能问题往往散落在资源、脚本和场景配置中；Profiler 能看到结果，却很难把问题直接交回到对应的资产和负责人。</p></div><div><span>OUTCOME</span><p>建立可扩展的规则扫描与报告系统，将一次版本巡检从约 2 小时缩短到 6 分钟，并接入打包前检查。</p></div></div></div>
+  </section>
+  <section class="metric-strip"><div><strong>6min</strong><span>完整项目巡检</span></div><div><strong>27</strong><span>内置检查规则</span></div><div><strong>41%</strong><span>峰值内存降低</span></div></section>
+  <section class="project-structure">
+    <div class="detail-section-head"><p class="mini-label">SYSTEM MAP</p><h2>项目结构</h2><p>从核心体验出发，把产品拆成边界清楚、能独立演进的四个部分。</p></div>
+    <div class="structure-grid"><article><span>01</span><h3>规则引擎</h3><p>每条检查规则独立声明适用资源、严重级别与修复建议，可按项目需要自由组合。</p></article><article><span>02</span><h3>资源索引</h3><p>缓存 GUID、依赖关系和导入配置，避免每次巡检都完整遍历 AssetDatabase。</p></article><article><span>03</span><h3>运行采样</h3><p>在目标场景自动采集帧时间、GC、DrawCall 与加载事件，并关联到具体对象。</p></article><article><span>04</span><h3>报告出口</h3><p>编辑器内可一键定位资源，同时输出 JSON 和 HTML 报告供 CI 与团队评审使用。</p></article></div>
+  </section>
+  <section class="design-decisions">
+    <div class="detail-section-head"><p class="mini-label">BEHIND THE PIXELS</p><h2>细节设计思路</h2><p>真正影响体验的，往往是那些看起来很小的决定。</p></div>
+    <div class="decision-list"><article><div class="decision-number">A</div><div><h3>报告必须能直接抵达问题现场</h3><p>每条结果都带资源路径、对象层级和快捷修复入口；开发者不需要在庞大的项目目录里再次搜索。</p></div><aside>↳ 从发现到定位只需一次点击</aside></article><article><div class="decision-number">B</div><div><h3>先给证据，再给建议</h3><p>规则展示命中的数据、阈值和影响范围，修复建议保持可选，避免工具在不同项目标准下做武断修改。</p></div><aside>↳ 自动检测，人工决策</aside></article><article><div class="decision-number">C</div><div><h3>缓存也要可验证地失效</h3><p>资源变更后按 GUID 增量更新索引，并提供缓存版本与完整重建入口，兼顾扫描速度和结果可信度。</p></div><aside>↳ 增量巡检保持在分钟级</aside></article></div>
+  </section>
+  <section class="next-project"><p>NEXT CASE / 01</p><a href="../echo-blade/"><span>继续浏览</span><strong>EchoBlade</strong><b>→</b></a></section>
+  <footer class="detail-footer"><a class="logo" href="../../">U7<span>.DEV</span></a><p>DESIGNED &amp; BUILT WITH CURIOSITY · 2026</p></footer>
+</main>
+</body>
+</html>
