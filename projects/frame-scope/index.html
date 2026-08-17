@@ -26,6 +26,10 @@
     <div class="summary-copy"><p class="lead">面向中小型 Unity 项目的编辑器巡检工具，一键定位重复资源、异常贴图、加载峰值和场景中的高开销对象。</p><div class="challenge-grid"><div><span>CHALLENGE</span><p>性能问题往往散落在资源、脚本和场景配置中；Profiler 能看到结果，却很难把问题直接交回到对应的资产和负责人。</p></div><div><span>OUTCOME</span><p>建立可扩展的规则扫描与报告系统，将一次版本巡检从约 2 小时缩短到 6 分钟，并接入打包前检查。</p></div></div></div>
   </section>
   <section class="metric-strip"><div><strong>6min</strong><span>完整项目巡检</span></div><div><strong>27</strong><span>内置检查规则</span></div><div><strong>41%</strong><span>峰值内存降低</span></div></section>
+  <section class="project-knowledge">
+    <div class="detail-section-head"><p class="mini-label">KEY CONCEPTS</p><h2>项目知识点</h2><p>从资源可观测性、编辑器扩展到自动化质量门禁，整理工具开发中的关键方法。</p></div>
+    <div class="knowledge-grid"><article><span>01</span><h3>AssetDatabase 与依赖分析</h3><p>通过 GUID、资源依赖和导入配置建立索引，将扫描结果准确关联到资产，避免重复全量遍历。</p></article><article><span>02</span><h3>可配置规则引擎</h3><p>让每条巡检规则独立声明匹配条件、严重级别和修复建议，使规则可组合、可扩展且适配不同项目。</p></article><article><span>03</span><h3>Addressables 资源管理</h3><p>检查资源引用、分组和加载策略，结合运行时采样定位加载峰值与生命周期问题，为打包前优化提供依据。</p></article></div>
+  </section>
   <section class="project-structure">
     <div class="detail-section-head"><p class="mini-label">SYSTEM MAP</p><h2>项目结构</h2><p>从核心体验出发，把产品拆成边界清楚、能独立演进的四个部分。</p></div>
     <div class="structure-grid"><article><span>01</span><h3>规则引擎</h3><p>每条检查规则独立声明适用资源、严重级别与修复建议，可按项目需要自由组合。</p></article><article><span>02</span><h3>资源索引</h3><p>缓存 GUID、依赖关系和导入配置，避免每次巡检都完整遍历 AssetDatabase。</p></article><article><span>03</span><h3>运行采样</h3><p>在目标场景自动采集帧时间、GC、DrawCall 与加载事件，并关联到具体对象。</p></article><article><span>04</span><h3>报告出口</h3><p>编辑器内可一键定位资源，同时输出 JSON 和 HTML 报告供 CI 与团队评审使用。</p></article></div>

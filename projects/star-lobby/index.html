@@ -26,6 +26,10 @@
     <div class="summary-copy"><p class="lead">支持四名玩家创建房间、选择角色并进入合作副本的联机原型，覆盖大厅状态同步、断线重连和弱网下的角色移动。</p><div class="challenge-grid"><div><span>CHALLENGE</span><p>大厅和副本之间存在多次场景切换；玩家准备、角色占用和连接状态必须保持一致，同时还要让高延迟玩家获得可接受的移动体验。</p></div><div><span>OUTCOME</span><p>将房间状态与场景对象分离，并加入客户端预测和服务端校正；150ms 模拟延迟下，移动与交互仍保持稳定。</p></div></div></div>
   </section>
   <section class="metric-strip"><div><strong>4P</strong><span>联机玩家数</span></div><div><strong>150ms</strong><span>弱网测试延迟</span></div><div><strong>98.6%</strong><span>重连恢复成功率</span></div></section>
+  <section class="project-knowledge">
+    <div class="detail-section-head"><p class="mini-label">KEY CONCEPTS</p><h2>项目知识点</h2><p>围绕多人联机中的同步、权威与恢复机制，梳理了这套原型的核心知识。</p></div>
+    <div class="knowledge-grid"><article><span>01</span><h3>服务端权威</h3><p>房间成员、准备状态与角色占用由服务器统一修改，客户端只提交请求并订阅结果，避免状态分叉。</p></article><article><span>02</span><h3>客户端预测与校正</h3><p>本地先响应移动输入，服务端下发权威快照；客户端对误差插值收敛，减少高延迟下的操控滞后感。</p></article><article><span>03</span><h3>会话与场景解耦</h3><p>将玩家会话数据独立于场景对象保存，使大厅、副本切换和断线重连都能恢复同一份关键状态。</p></article></div>
+  </section>
   <section class="project-structure">
     <div class="detail-section-head"><p class="mini-label">SYSTEM MAP</p><h2>项目结构</h2><p>从核心体验出发，把产品拆成边界清楚、能独立演进的四个部分。</p></div>
     <div class="structure-grid"><article><span>01</span><h3>会话大厅</h3><p>维护房间、成员、准备状态与角色选择，保证状态只由服务器权威修改。</p></article><article><span>02</span><h3>场景流程</h3><p>用持久 Session 数据跨越大厅与副本场景，并对加载进度做分阶段确认。</p></article><article><span>03</span><h3>移动同步</h3><p>本地预测即时响应输入，服务端校验并下发快照，客户端对误差进行平滑回滚。</p></article><article><span>04</span><h3>断线恢复</h3><p>以玩家身份令牌重新绑定角色，将关键局内状态从服务器快照恢复到新连接。</p></article></div>
