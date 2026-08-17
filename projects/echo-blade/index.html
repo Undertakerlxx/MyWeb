@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="第三人称动作战斗 Demo——一个以精准格挡和连招派生为核心的第三人称动作 Demo，重点验证战斗手感、状态组织与动画驱动的客户端架构。">
-  <meta property="og:title" content="EchoBlade · 项目档案">
-  <meta property="og:description" content="第三人称动作战斗 Demo——一个以精准格挡和连招派生为核心的第三人称动作 Demo，重点验证战斗手感、状态组织与动画驱动的客户端架构。">
+  <meta name="description" content="Unity DOTS 群体导航与弹幕系统——基于 Unity DOTS/ECS 的大规模群体跟随与弹幕系统。">
+  <meta property="og:title" content="Unity DOTS 群体导航与弹幕系统 · 项目档案">
+  <meta property="og:description" content="基于 Unity DOTS/ECS 的大规模群体跟随与弹幕系统。">
   <meta property="og:type" content="website">
   <meta property="og:image" content="../../assets/og.png">
   <meta name="twitter:card" content="summary_large_image">
-  <title>EchoBlade · 项目档案</title>
+  <title>Unity DOTS 群体导航与弹幕系统 · 项目档案</title>
   <link rel="icon" href="../../assets/favicon.svg">
   <link rel="stylesheet" href="../../assets/styles.css">
 </head>
@@ -18,25 +18,16 @@
   <nav class="pixel-nav detail-nav" aria-label="项目导航"><a class="logo" href="../../">U7<span>.DEV</span></a><a class="back-link" href="../../#projects">← 返回项目列表</a></nav>
   <header class="project-hero">
     <div class="project-kicker">CASE FILE / 01</div>
-    <div class="project-title-row"><div><p>ACTION GAME · 2026</p><h1>EchoBlade</h1><h2>第三人称动作战斗 Demo</h2></div><div class="detail-pixel-art" aria-hidden="true"><i></i><b></b><em></em><span></span></div></div>
-    <div class="detail-tags"><span>C++</span><span>Unreal Engine</span><span>GAS</span></div>
+    <div class="project-title-row"><div><p>UNITY DOTS · 2026</p><h1>Unity DOTS<br>群体导航与弹幕系统</h1><h2>大规模群体跟随、避障与对象池弹幕</h2></div><div class="detail-pixel-art" aria-hidden="true"><i></i><b></b><em></em><span></span></div></div>
+    <div class="detail-tags"><span>C#</span><span>Unity</span><span>ECS</span></div>
   </header>
   <section class="project-summary">
     <div><p class="mini-label">PROJECT INTRO</p><h2>项目介绍</h2></div>
-    <div class="summary-copy"><p class="lead">一个以精准格挡和连招派生为核心的第三人称动作 Demo，重点验证战斗手感、状态组织与动画驱动的客户端架构。</p><div class="challenge-grid"><div><span>CHALLENGE</span><p>攻击、位移、受击与动画事件相互交织，既要保证输入响应足够快，也要避免状态切换失控和逻辑散落在动画蓝图中。</p></div><div><span>OUTCOME</span><p>以 Gameplay Ability 和分层状态机重构战斗链路，形成可配置的招式数据；在 60fps 下将输入到动作反馈稳定在 50ms 内。</p></div></div></div>
+    <div class="summary-copy"><p class="lead">基于 Unity DOTS/ECS 的大规模群体跟随与弹幕系统。场景中批量生成代理单位，它们围绕主角保持指定距离，通过共享 Flow Field 获取全局移动方向，并结合 KNN 快速邻居查询与 ORCA 局部避障，实现群体单位的自然分流与实时避碰。ECS 对象池驱动的弹幕系统实现代理可批量发射投射物，投射物生命周期结束后回收到池中复用，减少高频创建和销毁带来的性能开销。整个场景通过 ECS 数据导向设计和 Job 化计算，支持大量单位同时移动、避障与弹幕射击。</p></div>
   </section>
-  <section class="metric-strip"><div><strong>&lt;50ms</strong><span>输入反馈延迟</span></div><div><strong>60fps</strong><span>目标战斗帧率</span></div><div><strong>18</strong><span>可配置招式</span></div></section>
   <section class="project-knowledge">
-    <div class="detail-section-head"><p class="mini-label">KEY CONCEPTS</p><h2>项目知识点</h2><p>把实现中最关键的客户端知识点，沉淀为可以复用的设计方法。</p></div>
-    <div class="knowledge-grid"><article><span>01</span><h3>Gameplay Ability System</h3><p>用 Ability、Effect 与 Tag 统一描述技能释放、冷却、消耗和状态限制，让战斗规则与表现层保持解耦。</p></article><article><span>02</span><h3>输入缓冲与取消窗口</h3><p>将玩家意图暂存到有限时长的缓冲区，并只在可取消窗口消费，兼顾即时响应与连招可控性。</p></article><article><span>03</span><h3>动画事件桥接</h3><p>以 Montage 和 Notify 标记命中、位移与派生时机；核心判定仍由 C++ 战斗状态驱动，避免逻辑分散。</p></article></div>
-  </section>
-  <section class="project-structure">
-    <div class="detail-section-head"><p class="mini-label">SYSTEM MAP</p><h2>项目结构</h2><p>从核心体验出发，把产品拆成边界清楚、能独立演进的四个部分。</p></div>
-    <div class="structure-grid"><article><span>01</span><h3>角色控制</h3><p>处理移动、镜头、锁定与输入缓冲，将玩家意图转为可被战斗系统消费的命令。</p></article><article><span>02</span><h3>战斗能力</h3><p>使用 GAS 组织攻击、闪避、格挡与受击，统一冷却、消耗、标签和效果结算。</p></article><article><span>03</span><h3>动画桥接</h3><p>Montage 与 Notify 只负责时间窗口和表现事件，战斗规则仍由 C++ 状态管理。</p></article><article><span>04</span><h3>数据配置</h3><p>招式段、派生条件、伤害与镜头反馈全部数据化，方便策划快速调整手感。</p></article></div>
-  </section>
-  <section class="design-decisions">
-    <div class="detail-section-head"><p class="mini-label">BEHIND THE PIXELS</p><h2>细节设计思路</h2><p>真正影响体验的，往往是那些看起来很小的决定。</p></div>
-    <div class="decision-list"><article><div class="decision-number">A</div><div><h3>输入缓冲服务于意图，而不是放宽一切</h3><p>只在动作后摇的可取消窗口缓存一条有效输入，并根据动作优先级消费，避免连续按键带来失控的自动连招。</p></div><aside>↳ 120ms 动态缓冲窗口</aside></article><article><div class="decision-number">B</div><div><h3>命中停顿不暂停整个世界</h3><p>通过攻击者与受击者的局部时间缩放制造重量感，同时保持特效、镜头和 UI 正常更新。</p></div><aside>↳ 手感与信息反馈同时保留</aside></article><article><div class="decision-number">C</div><div><h3>状态标签成为系统之间的共同语言</h3><p>动画、移动、技能与 UI 不直接相互引用，而是围绕可查询的 Gameplay Tags 协作，降低模块耦合。</p></div><aside>↳ 规则集中，表现解耦</aside></article></div>
+    <div class="detail-section-head"><p class="mini-label">KEY CONCEPTS</p><h2>项目知识点</h2><p>基于 ECS 架构文档，围绕数据导向设计、并行计算与系统调度梳理核心实现。</p></div>
+    <div class="knowledge-grid"><article><span>01</span><h3>ECS 数据导向设计</h3><p>Entity 仅标识对象，Component 使用结构体保存状态，System 批量处理同类组件；SoA 连续内存布局更利于缓存命中与大规模实体遍历。</p></article><article><span>02</span><h3>Authoring 与 Baker</h3><p>在 Inspector 通过 Authoring 提供配置入口，再由 Baker 烘焙为 ECS 组件和动态缓冲区，让运行时数据适合系统与 Job 高效读取。</p></article><article><span>03</span><h3>共享流场与 ECS 单例</h3><p>FlowFieldSystem 从唯一 Grid Entity 读取配置与缓冲区，只构建一次全局流场；所有 Agent 共享方向结果，避免重复寻路计算。</p></article><article><span>04</span><h3>Burst 与 IJobEntity 并行</h3><p>将流场方向、积分场等数据以 NativeArray 只读传入 Job，通过 BurstCompile 与 ScheduleParallel 并行计算大量 Agent 的期望速度。</p></article><article><span>05</span><h3>查询缓存与动态缓冲区</h3><p>EntityQuery 确定处理对象集合，ComponentLookup 按 Entity 随机读取固定组件，BufferLookup 管理每个 Agent 长度可变的邻居列表。</p></article><article><span>06</span><h3>EntityCommandBuffer</h3><p>批量生成 Agent 与投射物时延迟执行结构性变更，统一 Playback 后再创建实体和添加组件，避免查询或 Job 引用在处理中失效。</p></article><article><span>07</span><h3>流场重建请求实体</h3><p>障碍、净空或目标格变化只创建并合并 Request Entity，再由 FlowFieldSystem 集中消费，清晰分离生产者、消费者与请求生命周期。</p></article><article><span>08</span><h3>系统执行顺序</h3><p>先更新障碍和 Clearance，再构建流场、计算转向、收集邻居、执行 ORCA 避障，最后移动实体；通过更新组和依赖保证数据顺序正确。</p></article></div>
   </section>
   <section class="next-project"><p>NEXT CASE / 02</p><a href="../star-lobby/"><span>继续浏览</span><strong>StarLobby</strong><b>→</b></a></section>
   <footer class="detail-footer"><a class="logo" href="../../">U7<span>.DEV</span></a><p>DESIGNED &amp; BUILT WITH CURIOSITY · 2026</p></footer>
