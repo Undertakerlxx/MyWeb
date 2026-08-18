@@ -166,6 +166,12 @@ footer > div { display: flex; gap: 22px; }
 .project-title-row h2 { margin: 0; font-size: clamp(21px, 2.7vw, 36px); }
 .detail-pixel-art { height: 244px; }
 .dots-hero { padding-bottom: 70px; }
+.knowledge-detail-hero { padding-bottom: 64px; }
+.knowledge-detail-hero .project-title-row { display: block; max-width: 820px; margin: 42px 0 32px; }
+.knowledge-detail-hero .project-title-row h1 { max-width: 820px; font-size: clamp(58px, 8vw, 110px); line-height: .92; }
+.knowledge-detail-hero .project-title-row h1 span { display: block; }
+.knowledge-detail-hero .project-title-row h1 span + span { margin-top: 8px; font-size: .78em; }
+.knowledge-detail-hero .project-title-row h2 { max-width: 700px; margin-top: 26px; }
 .dots-hero .project-title-row { display: block; max-width: 980px; margin: 42px 0 32px; }
 .dots-hero .project-title-row h1 { max-width: 980px; font-size: clamp(52px, 6.7vw, 94px); line-height: .96; letter-spacing: -.06em; }
 .dots-hero .project-title-row h1 span { display: block; }
@@ -193,6 +199,25 @@ footer > div { display: flex; gap: 22px; }
 .knowledge-grid article > span { display: block; margin-bottom: 42px; color: var(--ink); font: 900 11px/1 var(--font-mono), monospace; }
 .knowledge-grid h3 { margin: 0 0 16px; font-size: 23px; }
 .knowledge-grid p { margin: 0; color: var(--muted); line-height: 1.8; }
+.knowledge-link-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.knowledge-link-card {
+  position: relative;
+  display: block;
+  min-height: 270px;
+  padding: 34px;
+  border: 3px solid var(--ink);
+  background: white;
+  box-shadow: 7px 7px 0 var(--blue);
+  transition: transform .18s, box-shadow .18s, background-color .18s;
+}
+.knowledge-link-card > span { display: block; margin-bottom: 48px; font: 900 11px/1 var(--font-mono), monospace; }
+.knowledge-link-card h3 { max-width: calc(100% - 52px); margin-bottom: 16px; font: 900 clamp(28px, 3vw, 42px)/1.05 Arial, sans-serif; letter-spacing: 0; }
+.knowledge-link-card p { max-width: 620px; padding-right: 28px; }
+.knowledge-link-card:hover { transform: translate(-4px, -4px); background: #dce7ff; box-shadow: 11px 11px 0 var(--ink); }
+.knowledge-link-card:focus-visible { outline: 4px solid var(--yellow); outline-offset: 5px; }
+.knowledge-link-card i { position: absolute; right: 28px; bottom: 26px; display: grid; width: 42px; height: 42px; place-items: center; background: var(--ink); color: white; font: 900 24px/1 Arial, sans-serif; font-style: normal; }
+.knowledge-card-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 27px; padding-right: 58px; }
+.knowledge-card-tags b { padding: 7px 9px; border: 2px solid var(--ink); font: 900 9px/1 var(--font-mono), monospace; }
 .dots-knowledge { background: #f4f0e7; }
 .docs-content { display: grid; gap: 24px; }
 .knowledge-chapter { padding: clamp(26px, 4vw, 48px); border: 3px solid var(--ink); background: white; box-shadow: 7px 7px 0 #d8d3c9; }
@@ -315,6 +340,8 @@ footer > div { display: flex; gap: 22px; }
 .decision-list article p { max-width: 650px; margin: 0; color: var(--muted); line-height: 1.8; }
 .decision-list aside { padding: 12px; border-left: 4px solid var(--blue); background: white; font: 800 10px/1.6 var(--font-mono), monospace; }
 .next-project { padding: 92px max(24px, calc((100vw - 1180px) / 2)); background: var(--blue); color: white; }
+.knowledge-return { padding: 82px 24px; text-align: center; background: var(--blue); border-bottom: 4px solid var(--ink); }
+.knowledge-return .pixel-button { display: inline-block; color: var(--ink); }
 .project-theme-yellow .next-project { background: #e5a400; color: var(--ink); }
 .project-theme-coral .next-project { background: #e95e48; }
 .next-project > p { font: 900 10px/1 var(--font-mono), monospace; }
@@ -355,6 +382,10 @@ footer > div { display: flex; gap: 22px; }
   .project-title-row h1 { font-size: 62px; }
   .dots-hero .project-title-row h1 { font-size: clamp(45px, 12vw, 68px); }
   .dots-hero .project-title-row h1 span + span { font-size: .72em; }
+  .knowledge-detail-hero .project-title-row h1 { font-size: clamp(46px, 13vw, 68px); }
+  .knowledge-link-card { min-height: 250px; padding: 28px 24px; }
+  .knowledge-link-card > span { margin-bottom: 42px; }
+  .knowledge-link-card h3 { max-width: calc(100% - 40px); }
   .compare-row { grid-template-columns: .7fr 1fr 1fr; }
   .compare-row span { padding: 10px 8px; font-size: 12px; }
   .info-callout { grid-template-columns: 1fr; gap: 10px; }

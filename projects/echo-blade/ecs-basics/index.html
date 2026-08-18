@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Unity DOTS 群体导航与弹幕系统的 ECS 架构基础：数据导向设计、流场、Job 与系统执行顺序。">
+  <meta property="og:title" content="ECS架构基础 · Unity DOTS 群体导航与弹幕系统">
+  <meta property="og:description" content="Unity DOTS 群体导航与弹幕系统的 ECS 架构基础。">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="../../../assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>ECS架构基础 · Unity DOTS 群体导航与弹幕系统</title>
+  <link rel="icon" href="../../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+</head>
+<body>
+<main class="project-page project-theme-blue knowledge-detail-page">
+  <nav class="pixel-nav detail-nav" aria-label="知识点导航"><a class="logo" href="../../../">U7<span>.DEV</span></a><a class="back-link" href="../">← 返回项目档案</a></nav>
+  <header class="project-hero knowledge-detail-hero">
+    <div class="project-kicker">KNOWLEDGE NOTE / 01</div>
+    <div class="project-title-row"><div><p>UNITY DOTS / FOUNDATIONS</p><h1><span>ECS架构</span><span>基础</span></h1><h2>从数据组织到群体导航系统协作</h2></div></div>
+    <div class="detail-tags"><span>DATA</span><span>JOBS</span><span>FLOW FIELD</span></div>
+  </header>
+  <section class="project-knowledge dots-notes" aria-labelledby="ecs-basics">
+    <header class="notes-section-head notes-head-dark"><span>01</span><div><p>UNITY ECS / FOUNDATIONS</p><h2 id="ecs-basics">ECS架构基础</h2></div><b>DATA · JOBS · FLOW FIELD</b></header>
+    <div class="notes-shell">
+      <p class="notes-intro">ECS（Entity Component System）是一种数据导向设计模式：让数据与行为分离，以更高效的方式处理大量实体。以下内容对应群体导航系统从配置、流场构建到批量移动的完整基础架构。</p>
+      <article class="note-block"><div class="note-label">01. CORE MODEL</div><h3>Entity、Component 与 System</h3><div class="role-grid"><div><b>Entity</b><span>对象的唯一 ID；本身不包含数据或逻辑，只负责标识。</span></div><div><b>Component</b><span>使用 struct 保存实体状态；不包含行为函数。</span></div><div><b>System</b><span>查询特定组件，并批量处理符合条件的实体。</span></div></div><h4>与 MonoBehaviour 的本质区别</h4><div class="compare-table notes-table"><div class="compare-row compare-head"><span>维度</span><span>MonoBehaviour</span><span>ECS</span></div><div class="compare-row"><span>内存布局</span><span>每个对象散落在堆上（AoS）</span><span>同类组件连续排列（SoA）</span></div><div class="compare-row"><span>缓存命中</span><span>较差，存在指针跳跃</span><span>很好，可线性遍历</span></div><div class="compare-row"><span>多线程</span><span>通常受主线程限制</span><span>可通过原生 Job System 并行</span></div><div class="compare-row"><span>GC 压力</span><span>较高，常使用 class 引用</span><span>较低，主要使用值类型与 Native 集合</span></div></div></article>
+      <article class="note-block"><div class="note-label">02. AUTHORING TO DATA</div><h3>Authoring 与 Baker：从 GameObject 到 Entity</h3><p>在 Authoring 组件中配置场景参数，再由 Baker 将配置烘焙为 ECS 组件与缓冲区。ASFlowFieldConfig 挂在网格 Entity 上，保存整个 GroupTarget 场景共享的流场寻路配置。</p><div class="code-pair"><pre><code>public struct ASFlowFieldConfig
+    : IComponentData { }</code></pre><pre><code>public class GridAuthoring : MonoBehaviour {
+  public int NodeXCount;
+  public int NodeYCount;
+  public float NodeSize;
+}</code></pre></div><pre class="code-wide"><code>public override void Bake(GridAuthoring authoring) {
+  Entity entity = GetEntity(TransformUsageFlags.Dynamic);
+  AddComponent(entity, new ASGrid { /* ... */ });
+  AddComponent(entity, new ASFlowFieldConfig { /* config */ });
+  AddBuffer&lt;ASGridNodesBufferComponent&gt;(entity);
+  AddBuffer&lt;ASIntegrationFieldCell&gt;(entity);
+  AddBuffer&lt;ASFlowDirectionCell&gt;(entity);
+}</code></pre><p class="note-callout"><b>职责划分</b> Authoring 负责 Inspector 中易用的配置入口；Baker 将这些配置转换为 ECS System 与 Job 高效读取的组件和缓冲区。</p></article>
+      <article class="note-block"><div class="note-label">03. SHARED FLOW FIELD</div><h3>ISystem、ECS 单例与共享流场</h3><p>FlowFieldSystem 每帧检查是否需要重建流场，并计算每个格子的代价与行进方向；系统本身不保存网格数据，而是从 Entity 读取。GroupTarget 场景只有一个带 ASGrid 的 Grid Entity，因此可通过 GetSingletonEntity 取得唯一网格实体。</p><pre class="code-wide"><code>Entity gridEntity = SystemAPI.GetSingletonEntity&lt;ASGrid&gt;();
+ASGrid grid = SystemAPI.GetComponent&lt;ASGrid&gt;(gridEntity);
+ASFlowFieldConfig config =
+    SystemAPI.GetComponent&lt;ASFlowFieldConfig&gt;(gridEntity);</code></pre><div class="singleton-flow" aria-label="FlowFieldSystem 与 Grid Entity 的关系流程图"><div>FlowFieldSystem<br><small>ISystem，每帧执行</small></div><i>读取</i><div>Grid Entity<br><small>唯一 ECS 单例</small></div><i>持有</i><div class="flow-stack"><span>ASGrid</span><span>ASFlowFieldConfig</span><span>ASFlowFieldState</span><span>Integration / Direction Buffers</span></div><i>共享读取</i><div>所有 GroupTarget Agent</div></div><p>FlowFieldSystem 只为单例网格生成一次流场，之后所有 Agent 共享读取结果，不需要各自计算寻路。</p></article>
+      <article class="note-block"><div class="note-label">04. PARALLEL JOBS</div><h3>Burst、Job 与并行实体处理</h3><p>系统将流场 Entity 上的缓冲区转换为 Job 可读取的 NativeArray，再以 FlowFieldSteeringJob 异步并行计算每个 Agent 的期望速度。</p><pre class="code-wide"><code>[BurstCompile]
+private partial struct FlowFieldSteeringJob : IJobEntity {
+  [ReadOnly] public NativeArray&lt;ASIntegrationFieldCell&gt; Integration;
+  [ReadOnly] public NativeArray&lt;ASFlowDirectionCell&gt; Directions;
+  public void Execute(in ASAgent agent,
+      ref ASPreferredVelocity preferredVelocity,
+      in LocalTransform transform) { /* write own velocity */ }
+}
+state.Dependency = new FlowFieldSteeringJob { /* ... */ }
+    .ScheduleParallel(state.Dependency);</code></pre><div class="parallel-flow" aria-label="共享流场并行处理流程图"><div class="parallel-source">共享流场<br><small>只读 NativeArray</small></div><div class="parallel-branches"><span>Agent A<br><small>计算自己的速度</small></span><span>Agent B<br><small>计算自己的速度</small></span><span>Agent C<br><small>计算自己的速度</small></span><span>...</span></div><div class="parallel-result">ScheduleParallel → 各自写回 ASPreferredVelocity</div></div><div class="mini-definition"><span><b>BurstCompile</b> 将 Job 编译为高性能原生代码，适合大量数值计算。</span><span><b>IJobEntity</b> 自动匹配拥有所需组件的 GroupTarget Agent。</span><span><b>ScheduleParallel</b> 将不同 Agent 的速度计算分配到多个工作线程。</span></div></article>
+      <article class="note-block"><div class="note-label">05. LOOKUPS &amp; CHANGES</div><h3>查询缓存、随机访问与延迟结构性变更</h3><div class="access-grid notes-access"><div><b>EntityQuery</b><span>确定本次处理哪一批实体：例如同时拥有 LocalTransform、ASAgent、ASAvoidanceAgent 与邻居缓冲区的 Agent。</span></div><div><b>ComponentLookup&lt;T&gt;</b><span>已知一个 Entity 时，快速随机访问固定组件，例如 LocalTransform、ASAgent。</span></div><div><b>BufferLookup&lt;T&gt;</b><span>已知一个 Entity 时，访问其长度可变的 DynamicBuffer 邻居列表。</span></div></div><p>KNN 算出某个 Agent 的邻居后，写入其专属动态缓冲区，为 ORCA 局部避障提供输入。批量生成 Agent 与投射物则使用 EntityCommandBuffer：Instantiate 和 AddComponent 都是结构性变更，直接在循环中修改 EntityManager 可能移动 Chunk、使查询或 Job 引用失效。</p><div class="ecb-flow"><span>计算本次生成数量</span><b>→</b><span>ecb.Instantiate / ecb.AddComponent<br><small>仅记录命令</small></span><b>→</b><span>全部 Agent 命令完成</span><b>→</b><span>ecb.Playback<br><small>统一创建与标记</small></span></div><p class="note-callout"><b>实际价值</b> 延迟并批量执行结构性变更，使新生成实体安全进入流场系统；对象池中的投射物回收与复用同样避免了高频创建、销毁带来的开销。</p></article>
+    </div>
+  </section>
+
+  <section class="project-knowledge dots-notes notes-request" aria-labelledby="request-entity">
+    <header class="notes-section-head notes-head-blue"><span>02</span><div><p>REBUILD LIFECYCLE</p><h2 id="request-entity">流场重建的临时状态：<br>Request Entity</h2></div><b>MERGE · THROTTLE · CONSUME</b></header>
+    <div class="notes-shell">
+      <article class="note-block"><div class="note-label">REQUEST PAYLOAD</div><h3>请求实体的职责与数据</h3><p>障碍扫描完成、流场代理尺寸变化或目标进入新的网格时，相关系统不直接重建流场，而是创建或更新一个 FlowFieldRebuildRequest Entity。Grid 的 ASFlowFieldState.PendingRebuildRequest 保存请求引用，确保每个 Grid 同一时刻最多只有一个请求。</p><div class="payload-grid"><div><b>ASFlowFieldRebuildRequest</b><span>Tag：表示存在待处理的流场重建请求。</span></div><div><b>ASFlowFieldRebuildRequestData</b><span>保存 Grid Entity、重建原因、最新目标位置与目标格。</span></div><div><b>PendingRebuildRequest</b><span>由 Grid 保存临时请求引用，保证请求唯一性。</span></div></div></article>
+      <article class="note-block"><div class="note-label">MERGE &amp; CONSUME</div><h3>请求来源、合并规则与消费策略</h3><div class="request-flow" aria-label="流场重建 Request Entity 流程图"><div class="request-sources"><span><b>Topology</b><small>障碍扫描完成<br>网格可通行性变化</small></span><span><b>Clearance</b><small>代理半径/高度变化<br>净空重建完成</small></span><span><b>TargetCell</b><small>目标进入新的网格</small></span></div><i>合并</i><div class="request-node"><b>同一个临时<br>Request Entity</b><small>携带最新输入与 Grid 引用</small></div><i>FlowFieldSystem 消费</i><div class="request-result"><b>重建完成</b><small>更新流场状态<br>销毁请求实体</small></div></div><div class="consume-grid"><div><b>Topology / Clearance</b><span>立即重建流场。</span></div><div><b>仅 TargetCell</b><span>遵守 TargetRebuildInterval 节流；节流期间持续更新最新目标信息。</span></div><div><b>构建完成</b><span>更新状态并销毁请求，明确结束生命周期。</span></div></div><p class="note-callout"><b>这种模式的优势</b> 生产者与消费者解耦；后续可加入优先级、原因位标记与调试数据；请求生命周期“创建＝排队、消费＝构建、销毁＝完成”清晰可见，并天然支持多实例网格独立消费。</p></article>
+    </div>
+  </section>
+
+  <section class="project-knowledge dots-notes notes-order" aria-labelledby="system-order">
+    <header class="notes-section-head notes-head-ink"><span>03</span><div><p>GROUPTARGET / UPDATE PIPELINE</p><h2 id="system-order">System 执行顺序</h2></div><b>ORDER GUARANTEES DATA CORRECTNESS</b></header>
+    <div class="notes-shell">
+      <p class="notes-intro">通过 UpdateInGroup、UpdateAfter 与 UpdateBefore 声明系统依赖：先更新障碍和安全通行数据，再使用主角最新位置构建流场；随后计算期望速度、收集邻居、执行 ORCA 避障，最后安全移动实体。</p>
+      <div class="system-flow" aria-label="GroupTarget System 执行顺序流程图"><div class="flow-phase"><span>INPUT</span><span>BUILD</span><span>STEER</span><span>AVOID</span><span>MOVE</span></div><div class="system-row"><span><b>01</b><strong>CheckObstaclesSystem</strong><small>扫描障碍，更新网格节点，发出 Topology 重建请求。</small></span></div><div class="system-row split"><span><b>02</b><strong>FlowFieldClearanceSystem</strong><small>根据障碍与代理尺寸构建安全可通行格。</small></span><span><b>03</b><strong>MainRoleMovementSystem</strong><small>更新主角最新位置。</small></span></div><div class="system-row"><span class="is-primary"><b>04</b><strong>FlowFieldSystem</strong><small>消费请求，使用最新目标与 Clearance 重建流场。</small></span></div><div class="system-row"><span><b>05</b><strong>FlowFieldSteeringSystem</strong><small>读取流场，为每个 Agent 写入期望速度。</small></span></div><div class="system-row"><span><b>06</b><strong>AgentNeighbourSystem</strong><small>收集附近代理，为 ORCA 避障准备邻居数据。</small></span></div><div class="system-row"><span><b>07</b><strong>AgentAvoidanceSystem</strong><small>计算避障后的实际速度；无避障组件时直接传递期望速度。</small></span></div><div class="system-row"><span><b>08</b><strong>FlowFieldAgentMovementSystem</strong><small>移动代理，并进行最终的静态障碍安全处理。</small></span></div></div>
+      <p class="note-callout"><b>顺序保证</b> FlowFieldClearanceSystem 位于 CheckObstaclesSystem 之后、FlowFieldSystem 之前；FlowFieldSteeringSystem 位于 FlowFieldSystem 之后；最终移动发生在避障速度生成之后，从而保证每一阶段读取的都是正确版本的数据。</p>
+    </div>
+  </section>
+  <section class="knowledge-return">
+    <a class="pixel-button primary" href="../">← 返回 Unity DOTS 项目档案</a>
+  </section>
+  <footer class="detail-footer"><a class="logo" href="../../../">U7<span>.DEV</span></a><p>DESIGNED &amp; BUILT WITH CURIOSITY · 2026</p></footer>
+</main>
+</body>
+</html>
