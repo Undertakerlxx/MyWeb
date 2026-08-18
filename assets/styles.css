@@ -218,6 +218,14 @@ footer > div { display: flex; gap: 22px; }
 .knowledge-link-card i { position: absolute; right: 28px; bottom: 26px; display: grid; width: 42px; height: 42px; place-items: center; background: var(--ink); color: white; font: 900 24px/1 Arial, sans-serif; font-style: normal; }
 .knowledge-card-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 27px; padding-right: 58px; }
 .knowledge-card-tags b { padding: 7px 9px; border: 2px solid var(--ink); font: 900 9px/1 var(--font-mono), monospace; }
+.flow-stage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 30px 0; }
+.flow-stage-grid > div { min-height: 145px; padding: 20px; border: 3px solid var(--ink); background: #f7f5ef; }
+.flow-stage-grid b { display: block; margin-bottom: 14px; color: var(--blue); font: 900 11px/1 var(--font-mono), monospace; }
+.flow-stage-grid span { color: var(--muted); font-size: 14px; line-height: 1.65; }
+.flow-feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 30px; }
+.flow-feature-grid > article { min-height: 230px; padding: 26px; border: 3px solid var(--ink); background: white; box-shadow: 6px 6px 0 #c7d3ef; }
+.flow-feature-grid b { display: block; margin-bottom: 14px; font: 900 15px/1.35 var(--font-mono), monospace; }
+.flow-feature-grid p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
 .dots-knowledge { background: #f4f0e7; }
 .docs-content { display: grid; gap: 24px; }
 .knowledge-chapter { padding: clamp(26px, 4vw, 48px); border: 3px solid var(--ink); background: white; box-shadow: 7px 7px 0 #d8d3c9; }
@@ -369,6 +377,7 @@ footer > div { display: flex; gap: 22px; }
   .experience-section, .project-summary, .project-knowledge, .project-structure, .design-decisions { width: 100%; padding: 84px 15px; }
   .projects-head, .experience-head { align-items: start; flex-direction: column; gap: 30px; }
   .skill-grid, .structure-grid, .knowledge-grid, .challenge-grid { grid-template-columns: 1fr; }
+  .flow-stage-grid, .flow-feature-grid { grid-template-columns: 1fr; }
   .timeline-item { grid-template-columns: 55px 1fr; }
   .timeline-period { grid-column: 2; }
   .timeline-item > div:last-child { grid-column: 2; }

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Unity DOTS 群体导航与弹幕系统中的流场寻路：积分场、方向场、驻留环、净空与并行构建。">
+  <meta property="og:title" content="流场寻路 · Unity DOTS 群体导航与弹幕系统">
+  <meta property="og:description" content="共享流场如何驱动大规模群体导航。">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="../../../assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>流场寻路 · Unity DOTS 群体导航与弹幕系统</title>
+  <link rel="icon" href="../../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../../assets/styles.css">
+</head>
+<body>
+<main class="project-page project-theme-blue knowledge-detail-page">
+  <nav class="pixel-nav detail-nav" aria-label="知识点导航"><a class="logo" href="../../../">U7<span>.DEV</span></a><a class="back-link" href="../">← 返回项目档案</a></nav>
+  <header class="project-hero knowledge-detail-hero">
+    <div class="project-kicker">KNOWLEDGE NOTE / 02</div>
+    <div class="project-title-row"><div><p>GROUP NAVIGATION / FLOW FIELD</p><h1><span>流场</span><span>寻路</span></h1><h2>让同一目标下的大规模单位共享导航结果</h2></div></div>
+    <div class="detail-tags"><span>PATHFINDING</span><span>CLEARANCE</span><span>PARALLEL</span></div>
+  </header>
+
+  <section class="project-knowledge dots-notes" aria-labelledby="flow-field-basics">
+    <header class="notes-section-head notes-head-dark"><span>01</span><div><p>FLOW FIELD / CORE PIPELINE</p><h2 id="flow-field-basics">流场寻路基础</h2></div><b>INTEGRATION · DIRECTION · STEERING</b></header>
+    <div class="notes-shell">
+      <p class="notes-intro">流场并不为每个单位生成一条独立路径，而是为整张地图预先计算“朝哪里走”。所有单位读取自己所在格子的方向，持续顺着同一份场移动。</p>
+      <article class="note-block">
+        <div class="note-label">THREE CORE STEPS</div>
+        <h3>从目标反推整张地图的移动方向</h3>
+        <div class="flow-stage-grid">
+          <div><b>01 / INTEGRATION</b><span>遍历地图网格，计算每个格子到目标格的累计代价，得到积分场。</span></div>
+          <div><b>02 / DIRECTION</b><span>检查周围八格，指向累计代价最小的合法邻居，得到方向场。</span></div>
+          <div><b>03 / STEERING</b><span>每个角色读取当前单格的方向，持续沿向量场移动。</span></div>
+          <div><b>04 / SHARED READ</b><span>同一目标下的所有单位复用同一份积分值和方向，不重复寻路。</span></div>
+        </div>
+        <div class="flow-line"><span>目标或目标区域</span><b>→</b><span>积分场<br><small>累计代价</small></span><b>→</b><span>方向场<br><small>最小代价邻居</small></span><b>→</b><span>单位持续顺流移动</span></div>
+      </article>
+      <article class="note-block">
+        <div class="note-label">BUILD PHASES</div>
+        <h3>流场构建的四个核心阶段</h3>
+        <div class="flow-stage-grid">
+          <div><b>01 / SAFE MAP</b><span>先构建安全地图，确认哪些格子可供当前尺寸的单位通过。</span></div>
+          <div><b>02 / TARGET SET</b><span>在每个安全连通区域中寻找驻留环种子，作为目标集合。</span></div>
+          <div><b>03 / BFS</b><span>从所有种子同时 BFS，填充 Distance = 0、1、2……的积分场。</span></div>
+          <div><b>04 / FLOW</b><span>让每个格子指向积分值更小的合法邻居，生成方向场并开始寻路。</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="project-knowledge dots-notes notes-request" aria-labelledby="flow-field-designs">
+    <header class="notes-section-head notes-head-blue"><span>02</span><div><p>RUNTIME / DESIGN DETAILS</p><h2 id="flow-field-designs">关键实现设计</h2></div><b>STAY · CLEARANCE · SMOOTH · SWEEP</b></header>
+    <div class="notes-shell">
+      <p class="notes-intro">共享方向解决“往哪里走”，但实际游戏中的停驻距离、角色尺寸、移动平滑和碰撞安全，需要在流场读取之后继续处理。</p>
+      <div class="flow-feature-grid">
+        <article><b>驻留环种子格</b><p>弹幕游戏中的远程敌人不会移动到主角脸上才射击，而要保持一段射击距离。因此将类圆环上的格子作为目标种子。若驻留环已被占满，则回退到更外侧、距驻留环最近的可用网格作为目标。</p></article>
+        <article><b>Clearance 构建</b><p>障碍占据的格子不可通行，但 3D 单位还具有半径和高度。即使中心点可通过，胶囊体也可能擦墙、卡角或生成后嵌入碰撞体。比如宽度 0.8m 的窄缝无法容纳直径 1.0m 的单位，应标记为不可通行。</p></article>
+        <article><b>双线性插值</b><p>单位通常不会精确踩在格子中心。根据附近四个格子的方向和单位到它们中心的距离计算权重，得到更合理的方向向量，减少格子边界的方向突变，让轨迹和朝向更圆滑。</p></article>
+        <article><b>胶囊体扫掠与滑墙</b><p>通过 CastCollider 将单位的实际碰撞形状沿移动向量连续扫过整段路径，寻找首次接触点。它处理贴墙穿模、高速位移隧穿和斜角穿障；碰墙后移除指向墙内的分量，保留沿墙分量，实现滑墙移动。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="project-knowledge dots-notes notes-order" aria-labelledby="flow-field-performance">
+    <header class="notes-section-head notes-head-ink"><span>03</span><div><p>PERFORMANCE / COMPARISON</p><h2 id="flow-field-performance">并行构建与 A* 对比</h2></div><b>PARALLEL BUILD · SHARED RESULT</b></header>
+    <div class="notes-shell">
+      <article class="note-block">
+        <div class="note-label">PARALLEL DESIGN</div>
+        <h3>只读共享数据，按格并行写入</h3>
+        <div class="mini-definition">
+          <span><b>清空旧流场</b>重构前清空旧数据时，每个线程只写自己的 index，也不需要读取邻居，因此可直接使用 <code>IJobParallelFor</code>。</span>
+          <span><b>生成方向场</b>积分场生成后，不同线程可以并行读取同一份只读积分场，并各自写入不同的方向格，安全使用 <code>IJobParallelFor</code>。</span>
+          <span><b>共享结果</b>流场完成后，群体单位只需读取当前位置的方向；单位规模增长主要增加读场与局部避障成本。</span>
+        </div>
+      </article>
+      <article class="note-block">
+        <div class="note-label">A* VS FLOW FIELD</div>
+        <h3>适合大量单位追逐同一目标</h3>
+        <div class="compare-table notes-table">
+          <div class="compare-row compare-head"><span>对比项</span><span>A* 寻路</span><span>流场寻路</span></div>
+          <div class="compare-row"><span>计算单位</span><span>每个单位各算一次</span><span>同一目标的所有单位共享一次计算</span></div>
+          <div class="compare-row"><span>输入</span><span>一个起点 + 一个终点</span><span>一个目标或目标区域</span></div>
+          <div class="compare-row"><span>输出</span><span>一条完整路径点列表</span><span>全地图每格的积分值和方向</span></div>
+          <div class="compare-row"><span>单位移动</span><span>沿路径点逐个前进</span><span>每帧读取当前位置方向，持续顺流移动</span></div>
+          <div class="compare-row"><span>适合场景</span><span>目的地不同、需要精确路径</span><span>大量单位追同一目标、向同一区域集合</span></div>
+          <div class="compare-row"><span>群体规模</span><span>单位越多，重复计算越多</span><span>目标不变时，单位增加主要只增加读场成本</span></div>
+          <div class="compare-row"><span>地图变化</span><span>通常只重算受影响单位的路径</span><span>通常重建整张流场</span></div>
+          <div class="compare-row"><span>路径个性化</span><span>强，每个单位可有不同目标或代价</span><span>弱，共享全局方向，个体差异交给局部避障</span></div>
+          <div class="compare-row"><span>内存形式</span><span>每个单位存一条路径点缓冲区</span><span>网格存一份积分场和方向场</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="knowledge-return"><a class="pixel-button primary" href="../">← 返回 Unity DOTS 项目档案</a></section>
+  <footer class="detail-footer"><a class="logo" href="../../../">U7<span>.DEV</span></a><p>DESIGNED &amp; BUILT WITH CURIOSITY · 2026</p></footer>
+</main>
+</body>
+</html>
